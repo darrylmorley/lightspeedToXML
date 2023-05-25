@@ -1,0 +1,25 @@
+{
+  "name": "lightspeedtoxml",
+  "version": "1.0.0",
+  "description": "A Nodejs script to convert Lightspeed Retail API data to XML for import into Google Merchant Centre",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "xml",
+    "lightspeed retail api"
+  ],
+  "author": {
+    "name": "Darryl Morley",
+    "email": "darrylmorley.uk@gmail.com"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "lightspeed-retail-sdk": "^2.0.5",
+    "slugify": "^1.6.6",
+    "xml": "^1.0.1"
+  }
+}
