@@ -15,7 +15,8 @@ class Item {
     condition = "",
     brand = "",
     gtin = "",
-    mpn = ""
+    mpn = "",
+    quantity = 0
   ) {
     this.id = id;
     this.title = title;
@@ -28,6 +29,7 @@ class Item {
     this.brand = brand;
     this.gtin = gtin;
     this.mpn = mpn;
+    this.quantity = quantity;
   }
 
   toXMLObject() {
@@ -55,6 +57,8 @@ class Item {
         { "g:gtin": this.gtin },
         { "g:brand": this.brand },
         { "g:mpn": this.mpn },
+        { "g:store_code": "5e79d2c0-c252-581a-be7a-060029190706" },
+        { "g:quantity": this.quantity },
       ],
     };
   }
@@ -116,6 +120,18 @@ const startApp = async () => {
       imgUrl = `${item.Images.Image.baseImageURL}/w_250/${item.Images.Image.publicID}.webp`;
     }
 
+    const getAvailability = (item) => {
+      const quantity = parseInt(item.ItemShops.ItemShop[0].qoh);
+
+      if (quantity <= 0) {
+        return "out of stock";
+      } else if (quantity > 0 && quantity <= 3) {
+        return "limited availability";
+      } else {
+        return "in stock";
+      }
+    };
+
     let description = `"${item.ItemECommerce?.shortDescription
       .replace(/<[^>]*>?/gm, "")
       .replaceAll('"', "inch")}"`;
@@ -135,11 +151,12 @@ const startApp = async () => {
       })}/${item.itemID}`,
       imgUrl,
       parseFloat(item.Prices.ItemPrice[0].amount).toFixed(2),
-      parseInt(item.ItemShops.ItemShop[0].qoh) >= 1 ? "in stock" : "out of stock",
+      parseInt(item.ItemShops.ItemShop[0].qoh) <= 0 ? "Out of stock" : "In stock",
       "new",
       item.Manufacturer?.name,
       item.upc,
-      item.manufacturerSku
+      item.manufacturerSku,
+      item.ItemShops.ItemShop[0].qoh
     );
 
     return newItem;
