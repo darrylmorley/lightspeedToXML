@@ -1,4 +1,4 @@
-import { appendFile } from "fs";
+import { appendFile, access, unlink, constants } from "fs";
 import api from "./lib/lightspeed.js";
 import slugify from "slugify";
 import xml from "xml";
@@ -63,6 +63,28 @@ class Item {
     };
   }
 
+  static async deleteFile() {
+    const filePath = "./products.xml";
+
+    // Check if the file exists
+    access(filePath, constants.F_OK, (err) => {
+      if (err) {
+        console.error("File does not exist");
+        return;
+      }
+
+      // Delete the file
+      unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting the file", err);
+          return;
+        }
+
+        console.log("File deleted successfully");
+      });
+    });
+  }
+
   static async saveAsXML(items) {
     const xmlObj = {
       rss: [
@@ -102,10 +124,14 @@ class Item {
 }
 
 const startApp = async () => {
+  await Item.deleteFile();
+
+  console.log("Fetching Items...");
   const items = await api.getItems(
     `["Category", "Manufacturer", "Images", "ItemShops", "ItemECommerce", "ItemPrices", "ItemAttributes", "ItemAttributes.ItemAttributeSet", "CustomFieldValues"]`
   );
 
+  console.log("Writing to products.xml...");
   const formattedItems = items.map((item) => {
     let imgUrl = "";
     let newItem;
@@ -163,6 +189,7 @@ const startApp = async () => {
   });
 
   await Item.saveAsXML(formattedItems);
+  console.log("Done! 🎉");
 };
 
 startApp();
