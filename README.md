@@ -25,9 +25,9 @@ Before you begin, ensure you have met the following requirements:
 
 2. Navigate & Install dependencies:
 
-```
-cd lightspeedToXML
- npm install
+```bash
+ cd lightspeedToXML
+npm install
 ```
 
 ---
@@ -55,9 +55,9 @@ npm run start
 
 ## Acknowledgments
 
-[Lightspeed API](https://developers.lightspeedhq.com/ecom/introduction/introduction/): Documentation for the Lightspeed API.
-[slugify](https://www.npmjs.com/package/slugify): Used for generating slugs from product descriptions.
-[xml](https://www.npmjs.com/package/xml): Used for creating XML documents.
+- [Lightspeed API](https://developers.lightspeedhq.com/ecom/introduction/introduction/): Documentation for the Lightspeed API.
+- [slugify](https://www.npmjs.com/package/slugify): Used for generating slugs from product descriptions.
+- [xml](https://www.npmjs.com/package/xml): Used for creating XML documents.
 
 ---
 
