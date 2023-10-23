@@ -66,4 +66,4 @@ npm run start
 Contributions are welcome! Feel free to open issues or pull requests to improve this project.
 
 Version History
-0.1.0 (Your Release Date): Initial release.
+0.1.0 (23/10/23): Initial release.
