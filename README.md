@@ -1,6 +1,7 @@
 # lightspeedToXML
 
-lightspeedToXML is a simple Node.js script that retrieves product data from your Lightspeed account and creates an XML file from the results.
+- lightspeedToXML is a simple Node.js script that retrieves product data from your Lightspeed account and creates an XML file from the results.
+- The generated XML file can be used for various purposes, such as feeding product information to other systems or platforms.
 
 ---
 
@@ -50,7 +51,7 @@ Run the script:
 npm run start
 ```
 
-## The generated XML file can be used for various purposes, such as feeding product information to other systems or platforms.
+---
 
 ## Acknowledgments
 
