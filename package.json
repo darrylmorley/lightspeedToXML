@@ -1,10 +1,12 @@
 {
-  "name": "lightspeedtoxml",
-  "version": "1.0.0",
-  "description": "A Nodejs script to convert Lightspeed Retail API data to XML for import into Google Merchant Centre",
+  "name": "lightspeed-retail-xml-google-merchant",
+  "version": "0.1.0",
+  "description": "A Nodejs script to convert Lightspeed Retail API data to XML suitable for import into Google Merchant Centre",
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
+    "lightspeedToXML": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
