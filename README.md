@@ -26,8 +26,8 @@ Before you begin, ensure you have met the following requirements:
 2. Navigate & Install dependencies:
 
 ```bash
- cd lightspeedToXML
-npm install
+  cd lightspeedToXML
+  npm install
 ```
 
 ---

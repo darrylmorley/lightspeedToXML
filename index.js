@@ -3,6 +3,9 @@ import api from "./lib/lightspeed.js";
 import slugify from "slugify";
 import xml from "xml";
 
+const FILE_PATH = "./products.xml";
+const BASE_URL = "https://www.shootingsuppliesltd.co.uk";
+
 class Item {
   constructor(
     id = 0,
@@ -64,17 +67,15 @@ class Item {
   }
 
   static async deleteFile() {
-    const filePath = "./products.xml";
-
     // Check if the file exists
-    access(filePath, constants.F_OK, (err) => {
+    access(FILE_PATH, constants.F_OK, (err) => {
       if (err) {
         console.error("File does not exist");
         return;
       }
 
       // Delete the file
-      unlink(filePath, (err) => {
+      unlink(FILE_PATH, (err) => {
         if (err) {
           console.error("Error deleting the file", err);
           return;
@@ -97,7 +98,7 @@ class Item {
         {
           channel: [
             { title: "Shooting Supplies Ltd" },
-            { link: "https://www.shootingsuppliesltd.co.uk" },
+            { link: BASE_URL },
             {
               description: "This is the product feed for Shooting Supplies Ltd",
             },
@@ -110,7 +111,7 @@ class Item {
     const xmlString = xml(xmlObj, { declaration: true, indent: "  " });
 
     try {
-      await appendFile("./products.xml", xmlString, (err) => {
+      await appendFile(FILE_PATH, xmlString, (err) => {
         if (err) {
           console.error("Error appending to products.xml:", err);
         } else {
@@ -124,72 +125,76 @@ class Item {
 }
 
 const startApp = async () => {
-  await Item.deleteFile();
+  try {
+    await Item.deleteFile();
 
-  console.log("Fetching Items...");
-  const items = await api.getItems(
-    `["Category", "Manufacturer", "Images", "ItemShops", "ItemECommerce", "ItemPrices", "ItemAttributes", "ItemAttributes.ItemAttributeSet", "CustomFieldValues"]`
-  );
-
-  console.log("Writing to products.xml...");
-  const formattedItems = items.map((item) => {
-    let imgUrl = "";
-    let newItem;
-
-    if (!item.Images?.Image) {
-      imgUrl = "";
-    } else if (Array.isArray(item.Images.Image)) {
-      imgUrl = item.Images.Image[0].FullPath
-        ? item.Images.Image[0].FullPath
-        : `${item.Images.Image[0].baseImageURL}/w_250/${item.Images.Image[0].publicID}.webp`;
-    } else {
-      imgUrl = `${item.Images.Image.baseImageURL}/w_250/${item.Images.Image.publicID}.webp`;
-    }
-
-    const getAvailability = (item) => {
-      const quantity = parseInt(item.ItemShops.ItemShop[0].qoh);
-
-      if (quantity <= 0) {
-        return "out of stock";
-      } else if (quantity > 0 && quantity <= 3) {
-        return "limited availability";
-      } else {
-        return "in stock";
-      }
-    };
-
-    let description = `"${item.ItemECommerce?.shortDescription
-      .replace(/<[^>]*>?/gm, "")
-      .replaceAll('"', "inch")}"`;
-
-    newItem = new Item(
-      item.itemID,
-      item.description
-        .toLowerCase()
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" "),
-      description,
-      `https://www.shootingsuppliesltd.co.uk/${slugify(item.description, {
-        lower: true,
-        replacement: "-",
-        strict: true,
-      })}/${item.itemID}`,
-      imgUrl,
-      parseFloat(item.Prices.ItemPrice[0].amount).toFixed(2),
-      parseInt(item.ItemShops.ItemShop[0].qoh) <= 0 ? "Out of stock" : "In stock",
-      "new",
-      item.Manufacturer?.name,
-      item.upc,
-      item.manufacturerSku,
-      item.ItemShops.ItemShop[0].qoh
+    console.log("Fetching Items...");
+    const items = await api.getItems(
+      `["Category", "Manufacturer", "Images", "ItemShops", "ItemECommerce", "ItemPrices", "ItemAttributes", "ItemAttributes.ItemAttributeSet", "CustomFieldValues"]`
     );
 
-    return newItem;
-  });
+    console.log("Writing to products.xml...");
+    const formattedItems = items.map((item) => {
+      let imgUrl = "";
+      let newItem;
 
-  await Item.saveAsXML(formattedItems);
-  console.log("Done! 🎉");
+      if (!item.Images?.Image) {
+        imgUrl = "";
+      } else if (Array.isArray(item.Images.Image)) {
+        imgUrl = item.Images.Image[0].FullPath
+          ? item.Images.Image[0].FullPath
+          : `${item.Images.Image[0].baseImageURL}/w_250/${item.Images.Image[0].publicID}.webp`;
+      } else {
+        imgUrl = `${item.Images.Image.baseImageURL}/w_250/${item.Images.Image.publicID}.webp`;
+      }
+
+      const getAvailability = (item) => {
+        const quantity = parseInt(item.ItemShops.ItemShop[0].qoh);
+
+        if (quantity <= 0) {
+          return "out of stock";
+        } else if (quantity > 0 && quantity <= 3) {
+          return "limited availability";
+        } else {
+          return "in stock";
+        }
+      };
+
+      let description = `"${item.ItemECommerce?.shortDescription
+        .replace(/<[^>]*>?/gm, "")
+        .replaceAll('"', "inch")}"`;
+
+      newItem = new Item(
+        item.itemID,
+        item.description
+          .toLowerCase()
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" "),
+        description,
+        `${BASE_URL}/${slugify(item.description, {
+          lower: true,
+          replacement: "-",
+          strict: true,
+        })}/${item.itemID}`,
+        imgUrl,
+        parseFloat(item.Prices.ItemPrice[0].amount).toFixed(2),
+        parseInt(item.ItemShops.ItemShop[0].qoh) <= 0 ? "Out of stock" : "In stock",
+        "new",
+        item.Manufacturer?.name,
+        item.upc,
+        item.manufacturerSku,
+        item.ItemShops.ItemShop[0].qoh
+      );
+
+      return newItem;
+    });
+
+    await Item.saveAsXML(formattedItems);
+    console.log("Done! 🎉");
+  } catch (error) {
+    console.error("There was an error: ", error);
+  }
 };
 
 startApp();
